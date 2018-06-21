@@ -10,11 +10,10 @@ from matplotlib import rcParams
 # Configuring some Visualization settings
 rcParams['figure.figsize'] = (14,7)
 rcParams['font.size'] = 12
-sb.set_style('whitegrid')
+sb.set_style('darkgrid')
 
 # Importing the Training Set
-dataset_train = pd.read_csv('Google_Stock_Price_Train.csv',parse_dates=['Date'])
-dataset_train.set_index(keys=['Date'],inplace=True)
+dataset_train = pd.read_csv('Google_Stock_Price_Train.csv')
 training_set = dataset_train.iloc[:,1:2].values
 
 # Feature Scaling
@@ -76,4 +75,38 @@ regressor.compile(optimizer='adam',loss='mean_squared_error')
 regressor.fit(X_train,y_train,batch_size=32,epochs=100)
 
 
+
 # Part 3 - Making the predictions and visualising the results
+
+# Getting the real stock price of 2017
+dataset_test = pd.read_csv('Google_Stock_Price_Test.csv')
+real_stock_price = dataset_test.iloc[:,1:2].values
+
+# Getting the predicted stock price of 2017
+dataset_total = pd.concat((dataset_train['Open'],dataset_test['Open']),axis=0)
+inputs = dataset_total[len(dataset_total)-len(dataset_test)-60:].values
+inputs = inputs.reshape(-1,1)
+inputs = scaler.transform(inputs)
+X_test = []
+for i in range(60, 80):
+    # range is (60,80) because we take the data of previous 60 days for the month of January
+    # January 2017 has 20 Financial days thus the range 60-(60+20)
+    X_test.append(inputs[i-60:i,0])
+X_test = np.array(X_test)
+# Reshaping
+X_test = np.reshape(X_test, newshape=(X_test.shape[0],X_test.shape[1],1))
+
+predicted_stock_price = regressor.predict(X_test)
+# Inverse the scaling to get original scale
+predicted_stock_price = scaler.inverse_transform(predicted_stock_price)
+
+# Visualising the results
+
+# Plotting the Real Google stock price
+plt.plot(real_stock_price, color='red', label='Real Google Stock Price')
+plt.plot(predicted_stock_price, color='blue', label='Predicted Google Stock Price')
+plt.title('Google Stock Price Prediction')
+plt.xlabel('Time')
+plt.ylabel('Google Stock Price')
+plt.legend()
+plt.show()
