@@ -110,3 +110,53 @@ plt.xlabel('Time')
 plt.ylabel('Google Stock Price')
 plt.legend()
 plt.show()
+
+
+# Part 4 - Improving and Tuning the RNN Model 
+
+from keras.wrappers.scikit_learn import KerasRegressor
+# Used for wrapping the keras model into scikit-learn
+from sklearn.model_selection import GridSearchCV
+
+def build_regressor(optimizer,units):
+    regressor = Sequential()
+    # Adding the first LSTM Layer and some dropout regularization
+    regressor.add(LSTM(units=units,return_sequences=True,input_shape=(X_train.shape[1],1)))
+    regressor.add(Dropout(0.2))    
+    # Adding a second LSTM Layer and some dropout regularization
+    regressor.add(LSTM(units=units,return_sequences=True))
+    regressor.add(Dropout(0.2))    
+    # Adding a third LSTM Layer and some dropout regularization
+    regressor.add(LSTM(units=units,return_sequences=True))
+    regressor.add(Dropout(0.2))    
+    # Adding a fourth LSTM Layer and some dropout regularization
+    regressor.add(LSTM(units=units,return_sequences=True))
+    regressor.add(Dropout(0.2))
+    # Adding a fifth LSTM Layer and some dropout regularization
+    regressor.add(LSTM(units=units))
+    regressor.add(Dropout(0.2))
+    # Adding the output layer
+    regressor.add(Dense(units=1))
+    # Compiling the RNN
+    regressor.compile(optimizer=optimizer,loss='mean_squared_error')
+    return regressor
+
+regressor = KerasRegressor(build_fn=build_regressor)
+
+# Create a Dictionary of Hyperparameters that we want to optimize
+parameters = {'batch_size':[25,32,64],
+              'epochs':[100,200,500],
+              'optimizer':['adam','rmsprop'],
+              'units':[50,100,150]}
+
+# Create an object of GridSearchCV and it on the training set like a normal model
+grid_search = GridSearchCV(estimator=regressor,
+                           param_grid=parameters,
+                           scoring='neg_mean_squared_error',
+                           cv=10)
+# Fitting on the training set
+grid_search.fit(X_train,y_train)
+
+# Best Parameters
+best_parameters = grid_search.best_params_    
+
