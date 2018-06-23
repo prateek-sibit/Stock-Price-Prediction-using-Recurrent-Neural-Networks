@@ -33,4 +33,4 @@ Each stock is described by 6 continuous variables. These are summarised below:
 3. High 
 4. Low
 5. Close
-6. Volumne 
+6. Volume 
