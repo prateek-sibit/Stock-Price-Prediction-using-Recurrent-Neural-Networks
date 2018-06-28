@@ -46,3 +46,7 @@ Each stock is described by 6 continuous variables. These are summarised below:
 4. Adding more LSTM layers: we built a RNN with four LSTM layers but you could try with even more.
 
 5. Adding more neurones in the LSTM layers: we highlighted the fact that we needed a high number of neurones in the LSTM layers to respond better to the complexity of the problem and we chose to include 50 neurones in each of our 4 LSTM layers. You could try an architecture with even more neurones in each of the 4 (or more) LSTM layers.
+
+## Citations : 
+
+*Dua, D. and Karra Taniskidou, E. (2017). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml]. Irvine, CA: University of California, School of Information and Computer Science*
